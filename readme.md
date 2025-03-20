@@ -22,7 +22,7 @@ venv_socialnetwork\Scripts\activate
 ```
 
 
-4. Instalar las dependencias:
+3. Instalar las dependencias:
 ```bash
 pip install -r requirements.txt
 ```
