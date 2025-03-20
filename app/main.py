@@ -1,6 +1,6 @@
 import streamlit as st
-from src.models.graph import SocialGraph
-from src.utils.config import INTERESES_OPCIONES
+from models.graph import SocialGraph
+from utils.config import INTERESES_OPCIONES
 
 def init_session_state():
     if 'perfiles' not in st.session_state:
