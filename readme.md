@@ -15,7 +15,12 @@ git clone https://github.com/your-username/Red-Social-grafos
 
 ```
 
-2. Activar el entorno virtual:
+2. Crear un entorno virtual:
+```bash
+python -m venv venv_socialnetwork
+```
+
+3. Activar el entorno virtual:
 - Windows:
 ```bash
 venv_socialnetwork\Scripts\activate
