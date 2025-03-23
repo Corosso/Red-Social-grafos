@@ -1,1 +1,1 @@
-INTERESES_OPCIONES = ["Proyectos Conjuntos", "Tutorías", "Publicaciones", "Etc."]
+INTERESES_OPCIONES = ["Proyectos Conjuntos", "Tutorías", "Publicaciones", "Tesis","Trabajo de investigación","Ponencias"]

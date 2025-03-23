@@ -1,5 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
+import community as community_louvain
+import numpy as np
 
 class SocialGraph:
     def __init__(self):
@@ -26,12 +28,24 @@ class SocialGraph:
         G_filtrado.add_edges_from(colaboraciones_filtradas)
         
         return G_filtrado
+
+    def detect_communities(self):
+        partition = community_louvain.best_partition(self.G)  # Detecta las comunidades
+        return partition
         
-    def draw_graph(self, fig_size=(6,4)):
-        pos = nx.spring_layout(self.G)
-        fig, ax = plt.subplots(figsize=fig_size)
-        color_map = ["blue" if self.G.nodes[n]["tipo"] == "Estudiante" 
-                    else "red" for n in self.G.nodes]
-        nx.draw(self.G, pos, with_labels=True, node_color=color_map, 
-                ax=ax, node_size=2000)
-        return fig
+    def draw_graph(self, fig_size=(6, 4), communities=False):
+
+            pos = nx.spring_layout(self.G)
+            fig, ax = plt.subplots(figsize=fig_size)
+
+            # Si comunidades está activado, asignamos colores por comunidad
+            if communities:
+                partition = self.detect_communities()
+                color_map = [partition[node] for node in self.G.nodes]
+            else:
+                color_map = ["blue" if self.G.nodes[n]["tipo"] == "Estudiante" 
+                             else "red" for n in self.G.nodes]
+
+            nx.draw(self.G, pos, with_labels=True, node_color=color_map, 
+                    ax=ax, node_size=2000)
+            return fig
