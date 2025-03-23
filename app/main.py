@@ -1,12 +1,79 @@
 import streamlit as st
+import networkx as nx
+import matplotlib.pyplot as plt
 from models.graph import SocialGraph
 from utils.config import INTERESES_OPCIONES
 
 def init_session_state():
     if 'perfiles' not in st.session_state:
-        st.session_state['perfiles'] = {}
+        st.session_state['perfiles'] = {
+            "Santiago Hernández": {
+                "programa_academico": "Ingeniería de Sistemas",
+                "facultad": "Facultad de Ingeniería",
+                "nivel": "Pregrado",
+                "habilidades_tecnicas": ["Programación", "Bases de Datos"],
+                "tipo": "Estudiante",
+                "intereses": ["Proyectos Conjuntos", "Tutorías"]
+            },
+            "Andres Sanchez": {
+                "programa_academico": "Medicina",
+                "facultad": "Facultad de Ciencias de la Salud",
+                "nivel": "Pregrado",
+                "habilidades_tecnicas": ["Anatomía", "Fisiología"],
+                "tipo": "Estudiante",
+                "intereses": ["Publicaciones", "Tesis"]
+            },
+            "Cristian Llano": {
+                "programa_academico": "Derecho",
+                "facultad": "Facultad de Ciencias Jurídicas",
+                "nivel": "Pregrado",
+                "habilidades_tecnicas": ["Legislación", "Investigación Jurídica"],
+                "tipo": "Estudiante",
+                "intereses": ["Trabajo de investigación", "Ponencias"]
+            },
+            "Melisa Duran": {
+                "programa_academico": "Arquitectura",
+                "facultad": "Facultad de Arquitectura y Diseño",
+                "nivel": "Pregrado",
+                "habilidades_tecnicas": ["Diseño", "Construcción"],
+                "tipo": "Estudiante",
+                "intereses": ["Proyectos Conjuntos", "Tutorías"]
+            },
+            "Lina Munera": {
+                "programa_academico": "",
+                "facultad": "",
+                "nivel": "",
+                "habilidades_tecnicas": ["Investigación", "Docencia"],
+                "tipo": "Profesor",
+                "intereses": ["Publicaciones", "Tesis"]
+            },
+            "Carolina Osorio": {
+                "programa_academico": "",
+                "facultad": "",
+                "nivel": "",
+                "habilidades_tecnicas": ["Investigación", "Docencia"],
+                "tipo": "Profesor",
+                "intereses": ["Trabajo de investigación", "Ponencias"]
+            },
+            "Patricia Rincón": {
+                "programa_academico": "",
+                "facultad": "",
+                "nivel": "",
+                "habilidades_tecnicas": ["Investigación", "Docencia"],
+                "tipo": "Profesor",
+                "intereses": ["Proyectos Conjuntos", "Tutorías"]
+            }
+        }
     if 'colaboraciones' not in st.session_state:
-        st.session_state['colaboraciones'] = []
+        st.session_state['colaboraciones'] = [
+            ("Santiago Hernández", "Patricia Rincón"),
+            ("Andres Sanchez", "Lina Munera"),
+            ("Cristian Llano", "Carolina Osorio"),
+            ("Melisa Duran", "Patricia Rincón"),
+            ("Santiago Hernández", "Lina Munera"),
+            ("Andres Sanchez", "Carolina Osorio"),
+            ("Cristian Llano", "Patricia Rincón")
+        ]
     if 'graph' not in st.session_state:
         st.session_state['graph'] = SocialGraph()
 
@@ -17,6 +84,12 @@ def main():
     perfiles = st.session_state['perfiles']
     colaboraciones = st.session_state['colaboraciones']
     graph = st.session_state['graph']
+
+    # Inicializar el grafo con los datos iniciales
+    for nombre, datos in perfiles.items():
+        graph.add_node(nombre, datos)
+    for nodo1, nodo2 in colaboraciones:
+        graph.add_edge(nodo1, nodo2)
 
     st.title("Red Social Académica")
 
@@ -37,21 +110,20 @@ def main():
         # Intereses
         intereses_seleccionados = st.multiselect("Intereses", INTERESES_OPCIONES)
         
-        if "Etc." in intereses_seleccionados:
+        if intereses_seleccionados and intereses_seleccionados[-1] == 'Etc.':
             interes_etc = st.text_input("Especifique el interés")
             if interes_etc:
-                intereses_seleccionados.remove("Etc.")
-                intereses_seleccionados.append(interes_etc)
+                intereses_seleccionados[-1] = interes_etc
 
         if st.button("Agregar/Actualizar Nodo"):
             if nombre:  # Asegurarse de que el nombre no esté vacío
                 perfiles[nombre] = {
-                    "programa_academico": programa_academico,
-                    "facultad": facultad,
-                    "nivel": nivel,
-                    "habilidades_tecnicas": habilidades_tecnicas.split(", "),  # Convertir habilidades a lista
-                    "tipo": tipo_usuario,
-                    "intereses": intereses_seleccionados
+                    'programa_academico': programa_academico,
+                    'facultad': facultad,
+                    'nivel': nivel,
+                    'habilidades_tecnicas': habilidades_tecnicas.split(", "),
+                    'tipo': tipo_usuario,
+                    'intereses': intereses_seleccionados
                 }
                 graph.add_node(nombre, perfiles[nombre])
                 st.success(f"Perfil de {nombre} agregado o actualizado.")
@@ -101,13 +173,28 @@ def main():
     with col2:
         st.header("Red de Colaboración")
         fig = graph.draw_graph()
+        
+        # Añadir leyenda
+        fig.legend(handles=[
+            plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='blue', markersize=10, label='Estudiantes'),
+            plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='red', markersize=10, label='Profesores')
+        ], loc='upper right')
+        
         st.pyplot(fig)
+
+        # Mostrar información del nodo seleccionado
+        if nodo1:
+            datos_nodo1 = perfiles[nodo1]
+            st.markdown(f"### INFORMACIÓN DEL PRIMER NODO SELECCIONADO: \n\n**Nombre:** {nodo1}\n\n**Tipo:** {datos_nodo1['tipo']}\n\n**Programa Académico:** {datos_nodo1['programa_academico']}\n\n**Intereses:** {', '.join(datos_nodo1['intereses'])}")
+
+        if nodo2:
+            datos_nodo2 = perfiles[nodo2]
+            st.markdown(f"### INFORMACIÓN DEL SEGUNDO NODO SELECCIONADO:\n\n**Nombre:** {nodo2}\n\n**Tipo:** {datos_nodo2['tipo']}\n\n**Programa Académico:** {datos_nodo2['programa_academico']}\n\n**Intereses:** {', '.join(datos_nodo2['intereses'])}")
 
     # Guardar los perfiles y colaboraciones en el estado de la sesión
     st.session_state['perfiles'] = perfiles
     st.session_state['colaboraciones'] = colaboraciones
     st.session_state['graph'] = graph
-
 
 if __name__ == "__main__":
     main()

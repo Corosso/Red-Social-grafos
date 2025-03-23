@@ -16,18 +16,23 @@ class SocialGraph:
     def remove_edge(self, nodo1, nodo2):
         self.G.remove_edge(nodo1, nodo2)
         
+    
     def get_filtered_graph(self, interes, perfiles, colaboraciones):
-        resultados = [nombre for nombre, datos in perfiles.items() 
-                     if interes in datos["intereses"]]
-        colaboraciones_filtradas = [(n1, n2) for n1, n2 in colaboraciones 
-                                  if n1 in resultados or n2 in resultados]
-        
+        resultados = {nombre for nombre, datos in perfiles.items() if interes in datos["intereses"]}
+    
+        # Agregar los nodos que tienen el interés
         G_filtrado = nx.Graph()
         for nombre in resultados:
             G_filtrado.add_node(nombre, tipo=perfiles[nombre]["tipo"])
-        G_filtrado.add_edges_from(colaboraciones_filtradas)
-        
+
+        # Mantener conexiones entre interesados y sus vecinos
+        for n1, n2 in colaboraciones:
+            if n1 in resultados or n2 in resultados:
+                G_filtrado.add_node(n1, tipo=perfiles[n1]["tipo"])  # Asegurar que el nodo está en el grafo
+                G_filtrado.add_node(n2, tipo=perfiles[n2]["tipo"])
+                G_filtrado.add_edge(n1, n2)
         return G_filtrado
+
 
     def detect_communities(self):
         partition = community_louvain.best_partition(self.G)  # Detecta las comunidades
@@ -38,7 +43,7 @@ class SocialGraph:
             pos = nx.spring_layout(self.G)
             fig, ax = plt.subplots(figsize=fig_size)
 
-            # Si comunidades est� activado, asignamos colores por comunidad
+            # Si comunidades est� activado, asignamos colores por comunidad
             if communities:
                 partition = self.detect_communities()
                 color_map = [partition[node] for node in self.G.nodes]
