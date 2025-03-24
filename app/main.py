@@ -100,14 +100,12 @@ def main():
         tipo_usuario = st.selectbox("Tipo de usuario", ["Estudiante", "Profesor"])
         nombre = st.text_input("Nombre")
         
-        # Solo Programa Académico en lugar de Carrera
         programa_academico = st.text_input("Programa Académico (ej. Ingeniería Civil, Medicina General)")
         
         facultad = st.text_input("Facultad")
         nivel = st.selectbox("Nivel", ["Pregrado", "Posgrado"])
         habilidades_tecnicas = st.text_area("Habilidades Técnicas (separadas por comas)", "")
 
-        # Intereses
         intereses_seleccionados = st.multiselect("Intereses", INTERESES_OPCIONES)
         
         if intereses_seleccionados and intereses_seleccionados[-1] == 'Etc.':
@@ -116,7 +114,7 @@ def main():
                 intereses_seleccionados[-1] = interes_etc
 
         if st.button("Agregar/Actualizar Nodo"):
-            if nombre:  # Asegurarse de que el nombre no esté vacío
+            if nombre:
                 perfiles[nombre] = {
                     'programa_academico': programa_academico,
                     'facultad': facultad,
@@ -127,30 +125,28 @@ def main():
                 }
                 graph.add_node(nombre, perfiles[nombre])
                 st.success(f"Perfil de {nombre} agregado o actualizado.")
-                
-                # Restablecer los campos a su estado inicial después de agregar el perfil
-                st.session_state['nombre'] = ''
-                st.session_state['tipo_usuario'] = 'Estudiante'
-                st.session_state['facultad'] = ''
-                st.session_state['programa_academico'] = ''
-                st.session_state['nivel'] = 'Pregrado'
-                st.session_state['habilidades_tecnicas'] = ''
-                st.session_state['intereses_seleccionados'] = []
-
+        
         st.header("Gestionar Colaboraciones")
         nodo1 = st.selectbox("Nodo 1", list(perfiles.keys()), index=None)
         nodo2 = st.selectbox("Nodo 2", list(perfiles.keys()), index=None)
         
         if st.button("Agregar Colaboración") and nodo1 and nodo2 and nodo1 != nodo2:
-            colaboraciones.append((nodo1, nodo2))
-            graph.add_edge(nodo1, nodo2)
-            st.success(f"Colaboración entre {nodo1} y {nodo2} agregada.")
-        
+            if (nodo1, nodo2) not in colaboraciones and (nodo2, nodo1) not in colaboraciones:
+                colaboraciones.append((nodo1, nodo2))
+                graph.add_edge(nodo1, nodo2)
+                st.success(f"Colaboración entre {nodo1} y {nodo2} agregada.")
+
         if st.button("Eliminar Colaboración") and nodo1 and nodo2:
             if (nodo1, nodo2) in colaboraciones:
                 colaboraciones.remove((nodo1, nodo2))
                 graph.remove_edge(nodo1, nodo2)
                 st.success(f"Colaboración entre {nodo1} y {nodo2} eliminada.")
+            elif (nodo2, nodo1) in colaboraciones:
+                colaboraciones.remove((nodo2, nodo1))
+                graph.remove_edge(nodo2, nodo1)
+                st.success(f"Colaboración entre {nodo2} y {nodo1} eliminada.")
+            else:
+                st.warning(f"No existe colaboración entre {nodo1} y {nodo2}.")
         
         st.header("Buscar Intereses Comunes")
         interes_buscar = st.selectbox("Seleccione un interés para buscar perfiles relacionados", 
@@ -165,16 +161,17 @@ def main():
             fig_restablecido = graph.draw_graph()
             st.pyplot(fig_restablecido)
         
-        # Botón para mostrar comunidades
         if st.button("Detectar Comunidades"):
+            comunidades = graph.detect_communities()
             fig_comunidades = graph.draw_graph(communities=True)
             st.pyplot(fig_comunidades)
+            for comunidad, nodos in comunidades.items():
+                st.write(f"La comunidad '{comunidad}' incluye los nodos: {', '.join(nodos)}")
 
     with col2:
         st.header("Red de Colaboración")
         fig = graph.draw_graph()
         
-        # Añadir leyenda
         fig.legend(handles=[
             plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='blue', markersize=10, label='Estudiantes'),
             plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='red', markersize=10, label='Profesores')
@@ -182,7 +179,6 @@ def main():
         
         st.pyplot(fig)
 
-        # Mostrar información del nodo seleccionado
         if nodo1:
             datos_nodo1 = perfiles[nodo1]
             st.markdown(f"### INFORMACIÓN DEL PRIMER NODO SELECCIONADO: \n\n**Nombre:** {nodo1}\n\n**Tipo:** {datos_nodo1['tipo']}\n\n**Programa Académico:** {datos_nodo1['programa_academico']}\n\n**Intereses:** {', '.join(datos_nodo1['intereses'])}")
@@ -191,7 +187,6 @@ def main():
             datos_nodo2 = perfiles[nodo2]
             st.markdown(f"### INFORMACIÓN DEL SEGUNDO NODO SELECCIONADO:\n\n**Nombre:** {nodo2}\n\n**Tipo:** {datos_nodo2['tipo']}\n\n**Programa Académico:** {datos_nodo2['programa_academico']}\n\n**Intereses:** {', '.join(datos_nodo2['intereses'])}")
 
-    # Guardar los perfiles y colaboraciones en el estado de la sesión
     st.session_state['perfiles'] = perfiles
     st.session_state['colaboraciones'] = colaboraciones
     st.session_state['graph'] = graph
