@@ -7,7 +7,16 @@ from utils.config import INTERESES_OPCIONES
 
 def init_session_state():
     
+    #Inicializa el estado de sesión de Streamlit.
+    
+    #Crea estructuras de datos para gestionar perfiles de usuarios,
+    #colaboraciones entre ellos y la instancia del grafo social.
+    
     if 'perfiles' not in st.session_state:
+        
+        #Acá creamos perfiles por defecto para que al correr el programa 
+        #ya se pueda visualizar un grafo
+        
         st.session_state['perfiles'] = {
             "Santiago Hernández": {
                 "programa_academico": "Ingeniería de Sistemas",
@@ -66,6 +75,7 @@ def init_session_state():
                 "intereses": ["Proyectos Conjuntos", "Tutorías"]
             }
         }
+    #Acá creamos las colaboraciones que "relacionan" los datos iniciales
     if 'colaboraciones' not in st.session_state:
         st.session_state['colaboraciones'] = [
             ("Santiago Hernández", "Patricia Rincón"),
@@ -81,7 +91,11 @@ def init_session_state():
 
 
 def main():
+    
+    #Configura la interfaz de usuario en Streamlit y gestiona la red social académica.
+    
     st.set_page_config(layout="wide")
+    #Acá vamos a realizar los estilos de la página
     st.markdown(
     """
     <style>
@@ -171,8 +185,13 @@ def main():
     col1, col2 = st.columns([2, 3])
 
     with col1:
+
+         # Sección para agregar un nuevo perfil al grafo
         st.header("Agregar Perfil")
+         # Selección del tipo de usuario (Estudiante o Profesor)
         tipo_usuario = st.selectbox("Tipo de usuario", ["Estudiante", "Profesor"])
+
+        #Entradas de texto para cada atributo
         nombre = st.text_input("Nombre")
         
         programa_academico = st.text_input("Programa Académico (ej. Ingeniería Civil, Medicina General)")
@@ -182,71 +201,90 @@ def main():
         habilidades_tecnicas = st.text_area("Habilidades Técnicas (separadas por comas)", "")
 
         intereses_seleccionados = st.multiselect("Intereses", INTERESES_OPCIONES)
-        
+         # Si el usuario selecciona 'Etc.', se le permite especificar un nuevo interés
         if intereses_seleccionados and intereses_seleccionados[-1] == 'Etc.':
             interes_etc = st.text_input("Especifique el interés")
             if interes_etc:
                 intereses_seleccionados[-1] = interes_etc
 
+        # Botón para agregar o actualizar un nodo en el grafo
         if st.button("Agregar/Actualizar Nodo"):
-            if nombre:
+            if nombre: # Verifica que el nombre no esté vacío
                 perfiles[nombre] = {
                     'programa_academico': programa_academico,
                     'facultad': facultad,
                     'nivel': nivel,
-                    'habilidades_tecnicas': habilidades_tecnicas.split(", "),
+                    'habilidades_tecnicas': habilidades_tecnicas.split(", "), # Convierte la cadena en una lista
                     'tipo': tipo_usuario,
                     'intereses': intereses_seleccionados
                 }
+                # Agregar el nodo al grafo con sus atributos
                 graph.add_node(nombre, perfiles[nombre])
                 st.success(f"Perfil de {nombre} agregado o actualizado.")
         
+        # Sección para gestionar colaboraciones entre perfiles
         st.header("Gestionar Colaboraciones")
+         # Selección de los nodos (perfiles) que colaborarán
         nodo1 = st.selectbox("Nodo 1", list(perfiles.keys()), index=None)
         nodo2 = st.selectbox("Nodo 2", list(perfiles.keys()), index=None)
-        
+
+        # Botón para agregar una colaboración entre dos nodos si no existe previamente
         if st.button("Agregar Colaboración") and nodo1 and nodo2 and nodo1 != nodo2:
             if (nodo1, nodo2) not in colaboraciones and (nodo2, nodo1) not in colaboraciones:
-                colaboraciones.append((nodo1, nodo2))
-                graph.add_edge(nodo1, nodo2)
+                colaboraciones.append((nodo1, nodo2)) # Agregar la relación a la lista de colaboraciones
+                graph.add_edge(nodo1, nodo2) # Agregar la arista al grafo
                 st.success(f"Colaboración entre {nodo1} y {nodo2} agregada.")
 
+
+        # Botón para eliminar una colaboración existente entre dos nodos
         if st.button("Eliminar Colaboración") and nodo1 and nodo2:
             if (nodo1, nodo2) in colaboraciones:
-                colaboraciones.remove((nodo1, nodo2))
-                graph.remove_edge(nodo1, nodo2)
+                colaboraciones.remove((nodo1, nodo2)) # Eliminar de la lista de colaboraciones
+                graph.remove_edge(nodo1, nodo2) # Eliminar la arista del grafo
                 st.success(f"Colaboración entre {nodo1} y {nodo2} eliminada.")
             elif (nodo2, nodo1) in colaboraciones:
-                colaboraciones.remove((nodo2, nodo1))
+                colaboraciones.remove((nodo2, nodo1)) # Eliminar la relación en el otro orden
                 graph.remove_edge(nodo2, nodo1)
                 st.success(f"Colaboración entre {nodo2} y {nodo1} eliminada.")
             else:
                 st.warning(f"No existe colaboración entre {nodo1} y {nodo2}.")
         
+        # Sección para buscar perfiles con intereses comunes
         st.header("Buscar Intereses Comunes")
+        # Dropdown para seleccionar un interés específico (excluyendo la opción 'Etc.')
         interes_buscar = st.selectbox("Seleccione un interés para buscar perfiles relacionados", 
                                      [i for i in INTERESES_OPCIONES if i != "Etc."])
         
+        # Botón para realizar la búsqueda de perfiles relacionados con el interés seleccionado
         if st.button("Buscar"):
+            # Filtra el grafo según el interés seleccionado
             G_filtrado = graph.get_filtered_graph(interes_buscar, perfiles, colaboraciones)
+            # Genera la visualización del grafo filtrado
             fig_filtrado = graph.draw_graph(G_filtrado)
+            # Muestra el grafo filtrado en la interfaz
             st.pyplot(fig_filtrado)
         
+        # Botón para restablecer la búsqueda y mostrar el grafo completo
         if st.button("Restablecer Búsqueda"):
-            fig_restablecido = graph.draw_graph()
+            fig_restablecido = graph.draw_graph() # Dibuja el grafo sin filtros
             st.pyplot(fig_restablecido)
         
+        # Botón para detectar comunidades dentro del grafo
         if st.button("Detectar Comunidades"):
-            comunidades = graph.detect_communities()
-            fig_comunidades = graph.draw_graph(communities=True)
-            st.pyplot(fig_comunidades)
-            for comunidad, nodos in comunidades.items():
+            comunidades = graph.detect_communities() # Identifica comunidades en el grafo
+            fig_comunidades = graph.draw_graph(communities=True)  # Genera la visualización del grafo con las comunidades resaltadas
+            st.pyplot(fig_comunidades)  # Muestra el grafo con las comunidades detectadas
+            for comunidad, nodos in comunidades.items():  # Muestra las comunidades detectadas con los nodos que pertenecen a cada una
                 st.write(f"La comunidad '{comunidad}' incluye los nodos: {', '.join(nodos)}")
 
+
+    # Sección para mostrar la red de colaboración
     with col2:
         st.header("Red de Colaboración")
+        # Genera la visualización del grafo con los nodos y conexiones actuales
         fig = graph.draw_graph()
         
+        # Agrega una leyenda para distinguir entre estudiantes y profesores en el grafo
         fig.legend(handles=[
             plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='blue', markersize=10, label='Estudiantes'),
             plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='red', markersize=10, label='Profesores')
@@ -254,17 +292,18 @@ def main():
         
         st.pyplot(fig)
 
+        # Si se ha seleccionado un primer nodo, muestra su información detallada
         if nodo1:
-            datos_nodo1 = perfiles[nodo1]
+            datos_nodo1 = perfiles[nodo1]  # Obtiene los datos del nodo seleccionado
             st.markdown(f"### INFORMACIÓN DEL PRIMER NODO SELECCIONADO: \n\n**Nombre:** {nodo1}\n\n**Tipo:** {datos_nodo1['tipo']}\n\n**Programa Académico:** {datos_nodo1['programa_academico']}\n\n**Intereses:** {', '.join(datos_nodo1['intereses'])}")
 
         if nodo2:
-            datos_nodo2 = perfiles[nodo2]
+            datos_nodo2 = perfiles[nodo2]  # Obtiene los datos del nodo seleccionado
             st.markdown(f"### INFORMACIÓN DEL SEGUNDO NODO SELECCIONADO:\n\n**Nombre:** {nodo2}\n\n**Tipo:** {datos_nodo2['tipo']}\n\n**Programa Académico:** {datos_nodo2['programa_academico']}\n\n**Intereses:** {', '.join(datos_nodo2['intereses'])}")
 
-    st.session_state['perfiles'] = perfiles
-    st.session_state['colaboraciones'] = colaboraciones
-    st.session_state['graph'] = graph
+    st.session_state['perfiles'] = perfiles  # Almacena el diccionario de perfiles en la sesión.
+    st.session_state['colaboraciones'] = colaboraciones  # Guarda la lista de colaboraciones (conexiones entre nodos).
+    st.session_state['graph'] = graph  # Guarda el grafo actualizado con los nodos y relaciones.
 
 if __name__ == "__main__":
     main()
