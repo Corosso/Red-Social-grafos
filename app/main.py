@@ -4,7 +4,9 @@ import matplotlib.pyplot as plt
 from models.graph import SocialGraph
 from utils.config import INTERESES_OPCIONES
 
+
 def init_session_state():
+    
     if 'perfiles' not in st.session_state:
         st.session_state['perfiles'] = {
             "Santiago Hernández": {
@@ -77,8 +79,81 @@ def init_session_state():
     if 'graph' not in st.session_state:
         st.session_state['graph'] = SocialGraph()
 
+
 def main():
     st.set_page_config(layout="wide")
+    st.markdown(
+    """
+    <style>
+        /* Fondo azul marino */
+        .stApp {
+            background-color: #1b263b; /* Azul marino oscuro */
+            color: white !important;
+        }
+
+        /* Títulos de TODOS los inputs */
+        label, .stTextInput label, .stNumberInput label, .stSelectbox label, .stRadio label, .stMultiSelect label {
+            font-family: 'Arial Black', sans-serif;
+            color: white !important; /* Blanco para que resalten */
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        /* Inputs de texto y números */
+        input[type="text"], input[type="number"], textarea {
+            background-color: #415a77 !important; /* Azul más claro */
+            color: white !important;
+            border-radius: 5px;
+            border: 2px solid #00c8ff !important; /* Borde azul claro */
+        }
+
+         /* Eliminar margen y padding de la página */
+        .stApp {
+            margin: 2px !important;
+            padding: 2px !important;
+        }
+
+        /* Eliminar margen superior */
+        header, .block-container {
+            padding-top: 0,1px !important;
+        }
+
+        /* Placeholder de los inputs */
+        input::placeholder, textarea::placeholder {
+            color: #b0c4de !important; /* Azul claro */
+        }
+
+        /* Selectbox */
+        div[data-baseweb="select"] {
+            background-color: #415a77 !important;
+            color: white !important;
+            border: 2px solid #00c8ff !important;
+            border-radius: 5px;
+        }
+
+        /* Opciones dentro del selectbox */
+        div[data-baseweb="select"] * {
+            color: white !important;
+            background-color: #415a77 !important;
+        }
+
+        /* Botones */
+        .stButton>button {
+            background-color: #0077b6 !important;
+            color: white !important;
+            font-size: 16px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .stButton>button:hover {
+            background-color: #005f99 !important;
+        }
+
+    </style>
+    """,
+    unsafe_allow_html=True
+    )
     init_session_state()
 
     perfiles = st.session_state['perfiles']
