@@ -151,7 +151,7 @@ class SocialGraph:
 
         return comunidades
     """       
-    def draw_graph(self, G=None, fig_size=(6, 4), node_size=300, communities=False):
+    def draw_graph(self, G=None, fig_size=(7, 4), node_size=320, communities=False):
         if G is None:
             G = self.G  # Usa el grafo principal si no se pasa uno
    
