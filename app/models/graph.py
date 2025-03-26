@@ -1,6 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 import community as community_louvain
+from collections import Counter
 
 class SocialGraph:
     
@@ -93,7 +94,44 @@ class SocialGraph:
 
         return G_filtrado
 
+    def detect_communities(self):
+        partition = community_louvain.best_partition(self.G)
 
+        # Agrupar nodos por comunidad
+        comunidades = {}
+        for nodo, comunidad_id in partition.items():
+            if comunidad_id not in comunidades:
+                comunidades[comunidad_id] = []
+            comunidades[comunidad_id].append(nodo)
+
+        # Diccionario para nombres personalizados de comunidades
+        nombres_generales = ["Comunidad de Estudio", "Comunidad de Investigación", "Comunidad de Tesis", 
+                            "Comunidad de Proyectos", "Comunidad de Redes", "Comunidad Académica"]
+
+        comunidades_nombradas = {}
+        for idx, (comunidad_id, nodos) in enumerate(comunidades.items()):
+            intereses = []
+
+            # Extraer intereses de los nodos en la comunidad
+            for nodo in nodos:
+                if "intereses" in self.G.nodes[nodo]:  # Verifica que el nodo tenga intereses
+                    intereses.extend(self.G.nodes[nodo]["intereses"])  # Agrega los intereses del nodo
+
+            # Determinar el interés más común en la comunidad
+            if intereses:
+                nombre_comunidad = Counter(intereses).most_common(1)[0][0]  # Toma el interés más repetido
+            else:
+                # Si no hay intereses, asigna un nombre predefinido
+                nombre_comunidad = nombres_generales[idx % len(nombres_generales)]
+
+            comunidades_nombradas[nombre_comunidad] = nodos
+
+            # Debug: Mostrar en consola los intereses analizados
+            print(f"Comunidad '{nombre_comunidad}' tiene los intereses: {intereses}")
+
+        return comunidades_nombradas
+    
+    """
     def detect_communities(self):
         
         #Detecta comunidades en el grafo utilizando el algoritmo de Louvain.
@@ -112,7 +150,7 @@ class SocialGraph:
             comunidades[comunidad_id].append(nodo)
 
         return comunidades
-        
+    """       
     def draw_graph(self, G=None, fig_size=(6, 4), node_size=300, communities=False):
         if G is None:
             G = self.G  # Usa el grafo principal si no se pasa uno
