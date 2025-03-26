@@ -70,6 +70,29 @@ class SocialGraph:
                 G_filtrado.add_edge(n1, n2)
         
         return G_filtrado
+    def buscar_y_filtrar(self, interes):
+        """
+        Filtra y muestra el grafo basado en un interés específico.
+        
+        Parámetros:
+        - interes (str): El interés por el cual se filtrarán los nodos.
+        
+        Retorna:
+        - nx.Graph: El grafo filtrado.
+        """
+        # Obtener el grafo filtrado
+        G_filtrado = self.get_filtered_graph(interes, self.perfiles, self.colaboraciones)
+
+        # Verificar si hay nodos en el grafo filtrado
+        if len(G_filtrado.nodes) == 0:
+            print(f"No se encontraron nodos con el interés: {interes}")
+            return None
+
+        # Dibujar el grafo filtrado
+        self.draw_graph(G_filtrado, fig_size=(6, 4), node_size=300, communities=True)
+
+        return G_filtrado
+
 
     def detect_communities(self):
         
@@ -90,8 +113,10 @@ class SocialGraph:
 
         return comunidades
         
-    def draw_graph(self, fig_size=(6, 4), node_size=300, communities=False):
-        
+    def draw_graph(self, G=None, fig_size=(6, 4), node_size=300, communities=False):
+        if G is None:
+            G = self.G  # Usa el grafo principal si no se pasa uno
+   
         #Dibuja el grafo con la opción de resaltar comunidades y ajustar el tamaño de los nodos.
         
         #Parámetros:
@@ -103,6 +128,7 @@ class SocialGraph:
         #matplotlib.figure.Figure: Figura generada para la visualización del grafo.
         
         pos = nx.spring_layout(self.G)  # Layout para distribuir los nodos
+        print("fig_size:", fig_size, type(fig_size))
         fig, ax = plt.subplots(figsize=fig_size)
 
         if communities:

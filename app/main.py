@@ -18,63 +18,88 @@ def init_session_state():
         #ya se pueda visualizar un grafo
         
         st.session_state['perfiles'] = {
-            "Santiago Hernández": {
-                "programa_academico": "Ingeniería de Sistemas",
-                "facultad": "Facultad de Ingeniería",
-                "nivel": "Pregrado",
-                "habilidades_tecnicas": ["Programación", "Bases de Datos"],
-                "tipo": "Estudiante",
-                "intereses": ["Proyectos Conjuntos", "Tutorías"]
-            },
-            "Andres Sanchez": {
-                "programa_academico": "Medicina",
-                "facultad": "Facultad de Ciencias de la Salud",
-                "nivel": "Pregrado",
-                "habilidades_tecnicas": ["Anatomía", "Fisiología"],
-                "tipo": "Estudiante",
-                "intereses": ["Publicaciones", "Tesis"]
-            },
-            "Cristian Llano": {
-                "programa_academico": "Derecho",
-                "facultad": "Facultad de Ciencias Jurídicas",
-                "nivel": "Pregrado",
-                "habilidades_tecnicas": ["Legislación", "Investigación Jurídica"],
-                "tipo": "Estudiante",
-                "intereses": ["Trabajo de investigación", "Ponencias"]
-            },
-            "Melisa Duran": {
-                "programa_academico": "Arquitectura",
-                "facultad": "Facultad de Arquitectura y Diseño",
-                "nivel": "Pregrado",
-                "habilidades_tecnicas": ["Diseño", "Construcción"],
-                "tipo": "Estudiante",
-                "intereses": ["Proyectos Conjuntos", "Tutorías"]
-            },
-            "Lina Munera": {
-                "programa_academico": "",
-                "facultad": "",
-                "nivel": "",
-                "habilidades_tecnicas": ["Investigación", "Docencia"],
-                "tipo": "Profesor",
-                "intereses": ["Publicaciones", "Tesis"]
-            },
-            "Carolina Osorio": {
-                "programa_academico": "",
-                "facultad": "",
-                "nivel": "",
-                "habilidades_tecnicas": ["Investigación", "Docencia"],
-                "tipo": "Profesor",
-                "intereses": ["Trabajo de investigación", "Ponencias"]
-            },
-            "Patricia Rincón": {
-                "programa_academico": "",
-                "facultad": "",
-                "nivel": "",
-                "habilidades_tecnicas": ["Investigación", "Docencia"],
-                "tipo": "Profesor",
-                "intereses": ["Proyectos Conjuntos", "Tutorías"]
-            }
+        "Santiago Hernández": {
+            "programa_academico": "Ingeniería de Sistemas",
+            "facultad": "Facultad de Ingeniería",
+            "nivel": "Pregrado",
+            "habilidades_tecnicas": ["Programación", "Bases de Datos"],
+            "tipo": "Estudiante",
+            "intereses": ["Proyectos Conjuntos", "Tutorías"]
+        },
+        "Andres Sanchez": {
+            "programa_academico": "Medicina",
+            "facultad": "Facultad de Ciencias de la Salud",
+            "nivel": "Pregrado",
+            "habilidades_tecnicas": ["Anatomía", "Fisiología"],
+            "tipo": "Estudiante",
+            "intereses": ["Publicaciones"]
+        },
+        "Cristian Llano": {
+            "programa_academico": "Derecho",
+            "facultad": "Facultad de Ciencias Jurídicas",
+            "nivel": "Pregrado",
+            "habilidades_tecnicas": ["Legislación", "Investigación Jurídica"],
+            "tipo": "Estudiante",
+            "intereses": ["Trabajo de investigación", "Ponencias"]
+        },
+        "Melisa Duran": {
+            "programa_academico": "Arquitectura",
+            "facultad": "Facultad de Arquitectura y Diseño",
+            "nivel": "Pregrado",
+            "habilidades_tecnicas": ["Diseño", "Construcción"],
+            "tipo": "Estudiante",
+            "intereses": ["Proyectos Conjuntos", "Tutorías"]
+        },
+        "Lina Munera": {
+            "programa_academico": "Doctorado en Economía",
+            "facultad": "Ciencias Exactas",
+            "nivel": "Posgrado",
+            "habilidades_tecnicas": ["Investigación", "Docencia"],
+            "tipo": "Profesor",
+            "intereses": ["Publicaciones"]
+        },
+        "Carolina Osorio": {
+            "programa_academico": "Docencia",
+            "facultad": "",
+            "nivel": "Posgrado",
+            "habilidades_tecnicas": ["Investigación", "Docencia"],
+            "tipo": "Profesor",
+            "intereses": ["Trabajo de investigación", "Ponencias"]
+        },
+        "Patricia Rincón": {
+            "programa_academico": "Ingeniería en Sistemas",
+            "facultad": "Ingeniería",
+            "nivel": "Posgrado",
+            "habilidades_tecnicas": ["Investigación", "Docencia"],
+            "tipo": "Profesor",
+            "intereses": ["Proyectos Conjuntos", "Tutorías"]
+        },
+        # 🔹 Nuevos perfiles agregados
+        "Laura Gómez": {
+            "programa_academico": "Ciencias Políticas",
+            "facultad": "Facultad de Ciencias Sociales",
+            "nivel": "Pregrado",
+            "habilidades_tecnicas": ["Análisis de datos", "Política Pública"],
+            "tipo": "Estudiante",
+            "intereses": ["Publicaciones"]
+        },
+        "Felipe Torres": {
+            "programa_academico": "Biología",
+            "facultad": "Facultad de Ciencias Naturales",
+            "nivel": "Pregrado",
+            "habilidades_tecnicas": ["Genética", "Ecología"],
+            "tipo": "Estudiante",
+            "intereses": ["Tesis"]
+        },
+        "Valeria Ruiz": {
+            "programa_academico": "Psicología",
+            "facultad": "Facultad de Ciencias Humanas",
+            "nivel": "Posgrado",
+            "habilidades_tecnicas": ["Psicoterapia", "Investigación"],
+            "tipo": "Profesor",
+            "intereses": ["Tesis"]
         }
+    }
     #Acá creamos las colaboraciones que "relacionan" los datos iniciales
     if 'colaboraciones' not in st.session_state:
         st.session_state['colaboraciones'] = [
@@ -84,7 +109,10 @@ def init_session_state():
             ("Melisa Duran", "Patricia Rincón"),
             ("Santiago Hernández", "Lina Munera"),
             ("Andres Sanchez", "Carolina Osorio"),
-            ("Cristian Llano", "Patricia Rincón")
+            ("Cristian Llano", "Patricia Rincón"),
+            ("Laura Gómez", "Santiago Hernández"),  # Relación entre estudiantes con interés en publicaciones
+            ("Felipe Torres", "Andres Sanchez"),  # Relación entre estudiantes con interés en tesis
+            ("Valeria Ruiz", "Cristian Llano")  # Relación entre estudiantes con interés en tesis
         ]
     if 'graph' not in st.session_state:
         st.session_state['graph'] = SocialGraph()
@@ -260,7 +288,7 @@ def main():
             # Filtra el grafo según el interés seleccionado
             G_filtrado = graph.get_filtered_graph(interes_buscar, perfiles, colaboraciones)
             # Genera la visualización del grafo filtrado
-            fig_filtrado = graph.draw_graph(G_filtrado)
+            fig_filtrado = graph.draw_graph(G=G_filtrado)
             # Muestra el grafo filtrado en la interfaz
             st.pyplot(fig_filtrado)
         
