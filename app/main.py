@@ -208,14 +208,14 @@ def main():
     for nodo1, nodo2 in colaboraciones:
         graph.add_edge(nodo1, nodo2)
 
-    st.title("Red Social Académica")
+    st.title("📚 Red Social Académica ✏️ ")
 
     col1, col2 = st.columns([2, 3])
 
     with col1:
 
          # Sección para agregar un nuevo perfil al grafo
-        st.header("Agregar Perfil")
+        st.header("Agregar Perfil ➕")
          # Selección del tipo de usuario (Estudiante o Profesor)
         tipo_usuario = st.selectbox("Tipo de usuario", ["Estudiante", "Profesor"])
 
@@ -251,7 +251,7 @@ def main():
                 st.success(f"Perfil de {nombre} agregado o actualizado.")
         
         # Sección para gestionar colaboraciones entre perfiles
-        st.header("Gestionar Colaboraciones")
+        st.header("Gestionar Colaboraciones 🤝")
          # Selección de los nodos (perfiles) que colaborarán
         nodo1 = st.selectbox("Nodo 1", list(perfiles.keys()), index=None)
         nodo2 = st.selectbox("Nodo 2", list(perfiles.keys()), index=None)
@@ -278,7 +278,7 @@ def main():
                 st.warning(f"No existe colaboración entre {nodo1} y {nodo2}.")
         
         # Sección para buscar perfiles con intereses comunes
-        st.header("Buscar Intereses Comunes")
+        st.header("Buscar Intereses Comunes 🧩")
         # Dropdown para seleccionar un interés específico (excluyendo la opción 'Etc.')
         interes_buscar = st.selectbox("Seleccione un interés para buscar perfiles relacionados", 
                                      [i for i in INTERESES_OPCIONES if i != "Etc."])
