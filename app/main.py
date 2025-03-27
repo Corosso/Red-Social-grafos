@@ -285,28 +285,35 @@ def main():
         
         # Botón para realizar la búsqueda de perfiles relacionados con el interés seleccionado
         if st.button("Buscar"):
-            # Filtra el grafo según el interés seleccionado
-            G_filtrado = graph.get_filtered_graph(interes_buscar, perfiles, colaboraciones)
-            # Genera la visualización del grafo filtrado
-            fig_filtrado = graph.draw_graph(G=G_filtrado)
-            # Muestra el grafo filtrado en la interfaz
-            st.pyplot(fig_filtrado)
+            fig_filtrado = graph.buscar_y_filtrar(interes_buscar)
+            if fig_filtrado:
+                st.pyplot(fig_filtrado)
+
+        def buscar_y_filtrar(self, interes):
+            G_filtrado = self.get_filtered_graph(interes, self.perfiles, self.colaboraciones)
+            if len(G_filtrado.nodes) == 0:
+                print(f"No se encontraron nodos con el interés: {interes}")
+                return None
+            self.draw_graph(G=G_filtrado, fig_size=(6, 4), node_size=300, communities=True)
+            return G_filtrado
         
         # Botón para restablecer la búsqueda y mostrar el grafo completo
         if st.button("Restablecer Búsqueda"):
             fig_restablecido = graph.draw_graph() # Dibuja el grafo sin filtros
             st.pyplot(fig_restablecido)
         
-        # Botón para detectar comunidades dentro del grafo
+
         if st.button("Detectar Comunidades"):
-            comunidades = graph.detect_communities() # Identifica comunidades en el grafo
-            fig_comunidades = graph.draw_graph(communities=True)  # Genera la visualización del grafo con las comunidades resaltadas
+            comunidades, comunidad_mapping = graph.detect_communities()  # Obtener ambas estructuras de datos
+
+            fig_comunidades = graph.draw_graph(communities=True, comunidad_mapping=comunidad_mapping)  # Pasa comunidad_mapping
             st.pyplot(fig_comunidades)  # Muestra el grafo con las comunidades detectadas
-            for comunidad, nodos in comunidades.items():  # Muestra las comunidades detectadas con los nodos que pertenecen a cada una
+
+            # Iterar sobre el diccionario de comunidades correctamente
+            for comunidad, nodos in comunidades.items():
                 st.write(f"La comunidad '{comunidad}' incluye los nodos: {', '.join(nodos)}")
 
 
-    # Sección para mostrar la red de colaboración
     with col2:
         st.header("Red de Colaboración")
         # Genera la visualización del grafo con los nodos y conexiones actuales
